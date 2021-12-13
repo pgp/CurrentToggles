@@ -1,6 +1,7 @@
 package it.pgp.currenttoggles.utils;
 
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -24,5 +25,9 @@ public class Misc {
 
     public static boolean isAirplaneModeEnabled(Context context) {
         return Settings.System.getInt(context.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+    }
+
+    public static boolean isBluetoothEnabled(Context unused){
+        return BluetoothAdapter.getDefaultAdapter().isEnabled();
     }
 }

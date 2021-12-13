@@ -21,6 +21,14 @@
         android:layout_height="match_parent" />
 
     <ImageButton
+        android:id="@+id/toggle_bt"
+        android:src="@drawable/bt"
+        android:background="@null"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <ImageButton
         android:id="@+id/toggle_airplane"
         android:src="@drawable/airplane"
         android:background="@null"

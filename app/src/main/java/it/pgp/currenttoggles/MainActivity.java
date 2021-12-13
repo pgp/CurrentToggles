@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    public static void toggleDataOrWifi(Context context, String channel, II ii) { // channel: "data" or "wifi
+    public static void toggleDataWifiBluetooth(Context context, String channel, II ii) { // channel: "data" or "wifi
         String[][] cmdsAndErrors = {
                 {channel + " currently DISABLED -> enabling...", "enable"},
                 {channel + " currently ENABLED -> disabling...", "disable"}
@@ -70,10 +70,13 @@ public class MainActivity extends Activity {
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleData:
-                toggleDataOrWifi(this, "data", Misc::isDataConnectionEnabled);
+                toggleDataWifiBluetooth(this, "data", Misc::isDataConnectionEnabled);
                 break;
             case R.id.toggleWifi:
-                toggleDataOrWifi(this, "wifi", Misc::isWifiEnabled);
+                toggleDataWifiBluetooth(this, "wifi", Misc::isWifiEnabled);
+                break;
+            case R.id.toggleBt:
+                toggleDataWifiBluetooth(this, "bluetooth", Misc::isBluetoothEnabled);
                 break;
             case R.id.toggleAirplane:
                 toggleAirplane(context);
