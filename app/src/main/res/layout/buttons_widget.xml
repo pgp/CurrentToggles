@@ -2,12 +2,12 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#BEEFFF" >
+    android:background="#23667B" >
 
     <ImageButton
         android:id="@+id/toggle_data"
         android:src="@drawable/data"
-        android:background="@null"
+        style="@android:style/Widget.Holo.ImageButton"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
@@ -15,7 +15,7 @@
     <ImageButton
         android:id="@+id/toggle_wifi"
         android:src="@drawable/wifi"
-        android:background="@null"
+        style="@android:style/Widget.Holo.ImageButton"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
@@ -23,7 +23,7 @@
     <ImageButton
         android:id="@+id/toggle_bt"
         android:src="@drawable/bt"
-        android:background="@null"
+        style="@android:style/Widget.Holo.ImageButton"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
@@ -31,7 +31,7 @@
     <ImageButton
         android:id="@+id/toggle_airplane"
         android:src="@drawable/airplane"
-        android:background="@null"
+        style="@android:style/Widget.Holo.ImageButton"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
