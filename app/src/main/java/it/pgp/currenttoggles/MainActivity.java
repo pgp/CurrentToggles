@@ -1,6 +1,7 @@
 package it.pgp.currenttoggles;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,12 +16,6 @@ import it.pgp.currenttoggles.utils.RootHandler;
 
 public class MainActivity extends Activity {
 
-    public static Context context;
-
-    public static void refreshAppContext(Context context) {
-        MainActivity.context = context;
-    }
-
     public interface II {
         boolean isEnabled(Context context);
     }
@@ -30,7 +25,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        refreshAppContext(this);
         setContentView(R.layout.activity_main);
     }
 
@@ -67,6 +61,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static void toggleBluetooth(Context context) {
+        BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
+        String msg = "Bluetooth ";
+        if(bta.isEnabled()) {
+            bta.disable();
+            msg += "disabled";
+        }
+        else {
+            bta.enable();
+            msg += "enabled";
+        }
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+    }
+
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleData:
@@ -76,10 +84,11 @@ public class MainActivity extends Activity {
                 toggleDataWifiBluetooth(this, "wifi", Misc::isWifiEnabled);
                 break;
             case R.id.toggleBt:
-                toggleDataWifiBluetooth(this, "bluetooth", Misc::isBluetoothEnabled);
+//                toggleDataWifiBluetooth(this, "bluetooth", Misc::isBluetoothEnabled);
+                toggleBluetooth(this);
                 break;
             case R.id.toggleAirplane:
-                toggleAirplane(context);
+                toggleAirplane(this);
         }
     }
 }

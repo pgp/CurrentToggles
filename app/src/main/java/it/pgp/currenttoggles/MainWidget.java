@@ -76,7 +76,6 @@ public class MainWidget extends AppWidgetProvider {
         String a = intent.getAction();
         Log.d(LOG_PREFIX,"onReceive action: "+intent.getAction());
         if (a == null) return;
-        if(MainActivity.context == null) MainActivity.refreshAppContext(context);
         try {
             switch(a) {
                 case onDemandWifi:
@@ -89,7 +88,8 @@ public class MainWidget extends AppWidgetProvider {
                     break;
                 case onDemandBluetooth:
                     Log.d(LOG_PREFIX,"onDemand Bluetooth");
-                    MainActivity.toggleDataWifiBluetooth(context, "bluetooth", Misc::isBluetoothEnabled);
+//                    MainActivity.toggleDataWifiBluetooth(context, "bluetooth", Misc::isBluetoothEnabled);
+                    MainActivity.toggleBluetooth(context);
                     break;
                 case onDemandAirplane:
                     Log.d(LOG_PREFIX,"onDemand Airplane");
