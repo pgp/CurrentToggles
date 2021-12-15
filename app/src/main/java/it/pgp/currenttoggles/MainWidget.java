@@ -19,6 +19,7 @@ public class MainWidget extends AppWidgetProvider {
     private static final String onDemandWifi = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_WIFI";
     private static final String onDemandData = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_DATA";
     private static final String onDemandBluetooth = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_BLUETOOTH";
+    private static final String onDemandAutoBrightness = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AUTO_BR";
     private static final String onDemandAirplane = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AIRPLANE";
 
     public static void updateAllDirect(Context context) {
@@ -59,6 +60,14 @@ public class MainWidget extends AppWidgetProvider {
             remoteViews.setOnClickPendingIntent(R.id.toggle_bt, pi);
 
             ii = new Intent(context, MainWidget.class);
+            ii.setAction(onDemandAutoBrightness);
+            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
+            pi = PendingIntent.getBroadcast(
+                    context, appWidgetId, ii,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.toggle_auto_brightness, pi);
+
+            ii = new Intent(context, MainWidget.class);
             ii.setAction(onDemandAirplane);
             ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
             pi = PendingIntent.getBroadcast(
@@ -90,6 +99,10 @@ public class MainWidget extends AppWidgetProvider {
                     Log.d(LOG_PREFIX,"onDemand Bluetooth");
 //                    MainActivity.toggleDataWifiBluetooth(context, "bluetooth", Misc::isBluetoothEnabled);
                     MainActivity.toggleBluetooth(context);
+                    break;
+                case onDemandAutoBrightness:
+                    Log.d(LOG_PREFIX,"onDemand Auto Brightness");
+                    MainActivity.toggleAutoScreenBrightness(context);
                     break;
                 case onDemandAirplane:
                     Log.d(LOG_PREFIX,"onDemand Airplane");

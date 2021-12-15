@@ -2,10 +2,13 @@ package it.pgp.currenttoggles;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
 
@@ -75,6 +78,30 @@ public class MainActivity extends Activity {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
+    public static void toggleAutoScreenBrightness(Context context) {
+        ContentResolver resolver = context.getContentResolver();
+        try {
+            boolean isAuto = Settings.System.getInt(resolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
+            Settings.System.putInt(resolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL); // set to 0 again, even if it is already 0
+            if(!isAuto) {
+                Settings.System.putInt(resolver,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC); // now it auto-adapts
+            }
+            Toast.makeText(context, "Brightness set to " + (isAuto ? "manual" : "auto"), Toast.LENGTH_SHORT).show();
+        }
+        catch(Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Unable to modify auto/manual brightness setting", Toast.LENGTH_SHORT).show();
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Please grant system settings write permission in order to use this toggle", Toast.LENGTH_SHORT).show();
+            context.startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
+        }
+    }
+
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleData:
@@ -86,6 +113,9 @@ public class MainActivity extends Activity {
             case R.id.toggleBt:
 //                toggleDataWifiBluetooth(this, "bluetooth", Misc::isBluetoothEnabled);
                 toggleBluetooth(this);
+                break;
+            case R.id.toggleAutoBrightness:
+                toggleAutoScreenBrightness(this);
                 break;
             case R.id.toggleAirplane:
                 toggleAirplane(this);

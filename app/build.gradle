@@ -9,7 +9,7 @@ android {
         applicationId "it.pgp.currenttoggles"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 100211214
+        versionCode 100211215
         versionName "1.0.0"
     }
 
