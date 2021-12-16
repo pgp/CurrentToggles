@@ -50,11 +50,7 @@ public class RootHandler {
         return found;
     }
 
-    public static int executeCommandAndWaitFor(String command, File workingDir, boolean runAsSuperUser, String... args) throws IOException {
-        String s = "";
-        s += command;
-        if (args != null) for (String arg : args) s += " " + arg;
-
+    public static int executeCommandAndWaitFor(String commandString, File workingDir, boolean runAsSuperUser) throws IOException {
         Process p;
         if (runAsSuperUser) {
             p = Runtime.getRuntime().exec("su");
@@ -62,14 +58,14 @@ public class RootHandler {
             if (workingDir != null) {
                 dos.writeBytes("cd " + workingDir +"\n");
             }
-            dos.writeBytes(s + "\n");
+            dos.writeBytes(commandString + "\n");
             dos.writeBytes("exit\n");
             dos.flush();
             dos.close();
         } else {
             p = (workingDir==null)?
-                    Runtime.getRuntime().exec(s):
-                    Runtime.getRuntime().exec(s,null,workingDir);
+                    Runtime.getRuntime().exec(commandString):
+                    Runtime.getRuntime().exec(commandString,null,workingDir);
         }
 
 //        lastStartedPid = getPidOfProcess(p);

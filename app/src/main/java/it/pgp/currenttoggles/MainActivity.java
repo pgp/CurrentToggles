@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    public static void toggleDataWifiBluetooth(Context context, String channel, II ii) { // channel: "data" or "wifi
+    public static void toggleDataWifiBluetooth(Context context, String channel, II ii) { // channel: "data" or "wifi"
         String[][] cmdsAndErrors = {
                 {channel + " currently DISABLED -> enabling...", "enable"},
                 {channel + " currently ENABLED -> disabling...", "disable"}
@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
         try {
             // svc data enable VS svc data disable
             // svc wifi enable VS svc wifi disable
-            RootHandler.executeCommandAndWaitFor("svc", null, true, channel, cmdsAndErrors[i][1]);
+            RootHandler.executeCommandAndWaitFor("svc "+channel+" "+cmdsAndErrors[i][1], null, true);
         }
         catch (IOException e) {
             e.printStackTrace();
