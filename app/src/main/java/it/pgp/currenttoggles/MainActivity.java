@@ -98,7 +98,9 @@ public class MainActivity extends Activity {
         catch(SecurityException e) {
             e.printStackTrace();
             Toast.makeText(context, "Please grant system settings write permission in order to use this toggle", Toast.LENGTH_SHORT).show();
-            context.startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
+            Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(i);
         }
     }
 
