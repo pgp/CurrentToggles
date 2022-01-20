@@ -37,6 +37,14 @@
         android:layout_height="match_parent" />
 
     <ImageButton
+        android:id="@+id/toggle_flashlight"
+        android:src="@drawable/flash"
+        style="@android:style/Widget.Holo.ImageButton"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <ImageButton
         android:id="@+id/toggle_airplane"
         android:src="@drawable/airplane"
         style="@android:style/Widget.Holo.ImageButton"

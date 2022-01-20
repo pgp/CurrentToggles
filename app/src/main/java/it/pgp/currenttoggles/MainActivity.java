@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -104,6 +105,31 @@ public class MainActivity extends Activity {
         }
     }
 
+    // we don't want to register any TorchCallback, just start with flash off assumption and then toggle from there
+    static boolean flashlightEnabled = false;
+    public static void toggleFlashlight(Context context) {
+        CameraManager camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        String cameraId;
+        try {
+            cameraId = camManager.getCameraIdList()[0];
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Unable to access flashlight", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        boolean b = !flashlightEnabled;
+        try {
+            camManager.setTorchMode(cameraId, b);
+            flashlightEnabled = b;
+            Toast.makeText(context, "Flashlight "+(b?"ON":"OFF"), Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Unable to toggle flashlight status", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleData:
@@ -118,6 +144,9 @@ public class MainActivity extends Activity {
                 break;
             case R.id.toggleAutoBrightness:
                 toggleAutoScreenBrightness(this);
+                break;
+            case R.id.toggleFlashlight:
+                toggleFlashlight(this);
                 break;
             case R.id.toggleAirplane:
                 toggleAirplane(this);
