@@ -29,6 +29,14 @@
         android:layout_height="match_parent" />
 
     <ImageButton
+        android:id="@+id/toggle_gps"
+        android:src="@drawable/gps"
+        style="@android:style/Widget.Holo.ImageButton"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <ImageButton
         android:id="@+id/toggle_auto_brightness"
         android:src="@drawable/brightness"
         style="@android:style/Widget.Holo.ImageButton"

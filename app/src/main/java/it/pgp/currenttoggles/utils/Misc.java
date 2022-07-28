@@ -2,6 +2,7 @@ package it.pgp.currenttoggles.utils;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -43,5 +44,10 @@ public class Misc {
 
     public static boolean isBluetoothEnabled(Context unused){
         return BluetoothAdapter.getDefaultAdapter().isEnabled();
+    }
+
+    public static boolean isGpsEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 }

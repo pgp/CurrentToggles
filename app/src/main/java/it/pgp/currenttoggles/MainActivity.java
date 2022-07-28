@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    public static void toggleDataWifiBluetooth(Context context, String channel, II ii) { // channel: "data" or "wifi"
+    public static void toggleDataWifiBluetoothGps(Context context, String channel, II ii) { // channel: "data" or "wifi"
         String[][] cmdsAndErrors = {
                 {channel + " currently DISABLED -> enabling...", "enable"},
                 {channel + " currently ENABLED -> disabling...", "disable"}
@@ -40,9 +40,16 @@ public class MainActivity extends Activity {
         int i = ii.isEnabled(context) ? 1 : 0;
         Toast.makeText(context, cmdsAndErrors[i][0], Toast.LENGTH_SHORT).show();
         try {
-            // svc data enable VS svc data disable
-            // svc wifi enable VS svc wifi disable
-            RootHandler.executeCommandAndWaitFor("svc "+channel+" "+cmdsAndErrors[i][1], null, true);
+            if(!("gps".equals(channel))) {
+                // svc data enable VS svc data disable
+                // svc wifi enable VS svc wifi disable
+                RootHandler.executeCommandAndWaitFor("svc "+channel+" "+cmdsAndErrors[i][1], null, true);
+            }
+            else {
+                String cmdPrefix = "settings put secure location_providers_allowed ";
+                String[] toggles = {"+gps,+network,+wifi","-gps,-network,-wifi"};
+                RootHandler.executeCommandAndWaitFor(cmdPrefix+toggles[i],null,true);
+            }
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -133,14 +140,17 @@ public class MainActivity extends Activity {
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleData:
-                toggleDataWifiBluetooth(this, "data", Misc::isDataConnectionEnabled);
+                toggleDataWifiBluetoothGps(this, "data", Misc::isDataConnectionEnabled);
                 break;
             case R.id.toggleWifi:
-                toggleDataWifiBluetooth(this, "wifi", Misc::isWifiEnabled);
+                toggleDataWifiBluetoothGps(this, "wifi", Misc::isWifiEnabled);
                 break;
             case R.id.toggleBt:
-//                toggleDataWifiBluetooth(this, "bluetooth", Misc::isBluetoothEnabled);
+//                toggleDataWifiBluetoothGps(this, "bluetooth", Misc::isBluetoothEnabled); // no need to do this using root
                 toggleBluetooth(this);
+                break;
+            case R.id.toggleGps:
+                toggleDataWifiBluetoothGps(this, "gps", Misc::isGpsEnabled);
                 break;
             case R.id.toggleAutoBrightness:
                 toggleAutoScreenBrightness(this);
