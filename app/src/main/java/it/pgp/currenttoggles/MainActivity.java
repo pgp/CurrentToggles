@@ -14,7 +14,10 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 
 import it.pgp.currenttoggles.utils.Misc;
 import it.pgp.currenttoggles.utils.RootHandler;
@@ -128,6 +131,41 @@ public class MainActivity extends Activity {
     // we don't want to register any TorchCallback, just start with flash off assumption and then toggle from there
     static boolean flashlightEnabled = false;
     public static void toggleFlashlight(Context context) {
+        // try detecting torch state
+        // TODO preliminarily, check in SharedPreferences whether we have already done this, and in case retrieve the target dir
+        int exitValue;
+        HashSet<String> s1 = new HashSet<>();
+        HashSet<String> s2 = new HashSet<>();
+        File workDir = new File("/sys/class/leds");
+        StringBuilder sb = new StringBuilder();
+        try {
+            // check for subdirs containing the "led:" substring
+            exitValue = RootHandler.executeCommandAndWaitFor("ls -1d *led\\:*", workDir, true, sb);
+            if(exitValue != 0) throw new Exception("led folders not found under /sys/class/leds");
+            Collections.addAll(s1, sb.toString().split("[\\r\\n]+"));
+            sb = new StringBuilder();
+            // check for subdirs containing the "torch" substring
+            exitValue = RootHandler.executeCommandAndWaitFor("ls -1d *torch*", workDir, true, sb);
+            if(exitValue != 0) throw new Exception("torch folders not found under /sys/class/leds");
+            Collections.addAll(s2, sb.toString().split("[\\r\\n]+"));
+            sb = new StringBuilder();
+
+            s1.retainAll(s2); // intersection of s1 and s2 is put into s1
+            if(s1.isEmpty()) throw new Exception("no common torch/led folder under /sys/class/leds");
+            String targetDir = s1.iterator().next();
+
+            exitValue = RootHandler.executeCommandAndWaitFor("cat "+targetDir+"/brightness", workDir, true, sb);
+            if(exitValue != 0) throw new Exception("no brightness file found under /sys/class/leds/"+targetDir);
+            int brightness = Integer.parseInt(sb.toString().trim());
+            flashlightEnabled = brightness != 0;
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            h.postDelayed(()->Toast.makeText(context, "Exception: "+e.getMessage()+"\nAssuming flash off", Toast.LENGTH_SHORT).show(),1000);
+            flashlightEnabled = false;
+        }
+        // TODO use SharedPreferences to save result path of the detection phase (and also possible detection failure) in order to avoid doing it every time
+
         CameraManager camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         String cameraId;
         try {
