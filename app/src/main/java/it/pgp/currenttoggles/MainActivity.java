@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.camera2.CameraManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -46,9 +47,20 @@ public class MainActivity extends Activity {
                 RootHandler.executeCommandAndWaitFor("svc "+channel+" "+cmdsAndErrors[i][1], null, true);
             }
             else {
-                String cmdPrefix = "settings put secure location_providers_allowed ";
-                String[] toggles = {"+gps,+network,+wifi","-gps,-network,-wifi"};
-                RootHandler.executeCommandAndWaitFor(cmdPrefix+toggles[i],null,true);
+                String command;
+                String cmdPrefix;
+                String[] toggles;
+                String commonPrefix = "settings put secure ";
+                if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) { // handle GPS till Android 9
+                    cmdPrefix = "location_providers_allowed ";
+                    toggles = new String[]{"+gps,+network,+wifi","-gps,-network,-wifi"};
+                }
+                else { // handle GPS from Android 10 onwards
+                    cmdPrefix = "location_mode ";
+                    toggles = new String[]{"3","0"};
+                }
+                command = commonPrefix+cmdPrefix+toggles[i];
+                RootHandler.executeCommandAndWaitFor(command,null,true);
             }
         }
         catch (IOException e) {
