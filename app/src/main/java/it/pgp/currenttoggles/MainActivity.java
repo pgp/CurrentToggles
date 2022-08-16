@@ -5,12 +5,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -128,15 +130,14 @@ public class MainActivity extends Activity {
         }
     }
 
-    // we don't want to register any TorchCallback, just start with flash off assumption and then toggle from there
-    static boolean flashlightEnabled = false;
-    public static void toggleFlashlight(Context context) {
-        // try detecting torch state
-        // TODO preliminarily, check in SharedPreferences whether we have already done this, and in case retrieve the target dir
+    public static final String TORCH_MODE_PATH = "TORCH_MODE_PATH";
+    public static final File workDir = new File("/sys/class/leds");
+
+    public static String detectTorchModePath() {
+        Log.d("CTORCH","Detecting torch mode file path...");
         int exitValue;
         HashSet<String> s1 = new HashSet<>();
         HashSet<String> s2 = new HashSet<>();
-        File workDir = new File("/sys/class/leds");
         StringBuilder sb = new StringBuilder();
         try {
             // check for subdirs containing the "led:" substring
@@ -148,23 +149,47 @@ public class MainActivity extends Activity {
             exitValue = RootHandler.executeCommandAndWaitFor("ls -1d *torch*", workDir, true, sb);
             if(exitValue != 0) throw new Exception("torch folders not found under /sys/class/leds");
             Collections.addAll(s2, sb.toString().split("[\\r\\n]+"));
-            sb = new StringBuilder();
 
             s1.retainAll(s2); // intersection of s1 and s2 is put into s1
             if(s1.isEmpty()) throw new Exception("no common torch/led folder under /sys/class/leds");
-            String targetDir = s1.iterator().next();
-
-            exitValue = RootHandler.executeCommandAndWaitFor("cat "+targetDir+"/brightness", workDir, true, sb);
-            if(exitValue != 0) throw new Exception("no brightness file found under /sys/class/leds/"+targetDir);
-            int brightness = Integer.parseInt(sb.toString().trim());
-            flashlightEnabled = brightness != 0;
+            return s1.iterator().next();
         }
         catch(Exception e) {
             e.printStackTrace();
-            h.postDelayed(()->Toast.makeText(context, "Exception: "+e.getMessage()+"\nAssuming flash off", Toast.LENGTH_SHORT).show(),1000);
-            flashlightEnabled = false;
+            Log.e("CTORCH","Unable to detect torch mode path");
+            return "N/A";
         }
-        // TODO use SharedPreferences to save result path of the detection phase (and also possible detection failure) in order to avoid doing it every time
+    }
+
+    public static boolean detectTorchMode(Context context) {
+        SharedPreferences settings = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        String torchModePath = settings.getString(TORCH_MODE_PATH, "");
+
+        if("".equals(torchModePath)) { // no torch mode file path detection has been performed yet
+            torchModePath = detectTorchModePath();
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(TORCH_MODE_PATH,torchModePath).apply();
+        }
+        if("N/A".equals(torchModePath)) return false; // torch mode file path detection has been performed (in another run or just now), and there were errors
+        else {
+            try {
+                StringBuilder sb = new StringBuilder();
+                int exitValue = RootHandler.executeCommandAndWaitFor("cat "+torchModePath+"/brightness", workDir, true, sb);
+                if(exitValue != 0) {
+                    Log.e("CTORCH","no brightness file found under /sys/class/leds/" + torchModePath);
+                    return false;
+                }
+                return Integer.parseInt(sb.toString().trim()) != 0;
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    public static void toggleFlashlight(Context context) {
+        boolean flashlightEnabled = detectTorchMode(context);
 
         CameraManager camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         String cameraId;
@@ -179,7 +204,6 @@ public class MainActivity extends Activity {
         boolean b = !flashlightEnabled;
         try {
             camManager.setTorchMode(cameraId, b);
-            flashlightEnabled = b;
             Toast.makeText(context, "Flashlight "+(b?"ON":"OFF"), Toast.LENGTH_SHORT).show();
         }
         catch(Exception e) {
