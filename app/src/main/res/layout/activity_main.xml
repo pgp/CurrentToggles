@@ -47,4 +47,10 @@
         android:id="@+id/toggleAirplane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <Button
+        android:text="Energy saving"
+        android:onClick="toggle"
+        android:id="@+id/toggleES"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

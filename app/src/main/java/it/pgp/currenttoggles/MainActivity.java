@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
             if(!("gps".equals(channel))) {
                 // svc data enable VS svc data disable
                 // svc wifi enable VS svc wifi disable
-                RootHandler.executeCommandAndWaitFor("svc "+channel+" "+cmdsAndErrors[i][1], null, true);
+                RootHandler.executeCommandAndWaitFor("svc "+channel+" "+cmdsAndErrors[i][1], null, true, null);
             }
             else {
                 String command;
@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
                     toggles = new String[]{"3","0"};
                 }
                 command = commonPrefix+cmdPrefix+toggles[i];
-                RootHandler.executeCommandAndWaitFor(command,null,true);
+                RootHandler.executeCommandAndWaitFor(command,null,true,null);
             }
         }
         catch (IOException e) {
@@ -76,7 +76,8 @@ public class MainActivity extends Activity {
         Toast.makeText(context, msgs[airplaneEnabled], Toast.LENGTH_SHORT).show();
         try {
             RootHandler.executeCommandAndWaitFor(
-                    "settings put global airplane_mode_on "+(1-airplaneEnabled)+" && am broadcast -a android.intent.action.AIRPLANE_MODE", null, true);
+                    "settings put global airplane_mode_on "+(1-airplaneEnabled)+" && am broadcast -a android.intent.action.AIRPLANE_MODE",
+                    null, true, null);
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -149,6 +150,25 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static void toggleEnergySaving(Context context) {
+        String getCmd = "settings get global low_power";
+        String[] msgs = {"Energy saving currently DISABLED -> enabling...", "Energy saving currently ENABLED -> disabling..."};
+        StringBuilder output = new StringBuilder();
+        try {
+            int exitValue = RootHandler.executeCommandAndWaitFor(getCmd, null, true, output);
+            if(exitValue != 0) throw new Exception("Exit value for toggleEnergySaving get command: "+exitValue);
+            int ESState = Integer.parseInt(output.toString().trim());
+            if(ESState != 0 && ESState != 1) throw new Exception("Unexpected parsed ES state: "+ESState);
+            Toast.makeText(context, msgs[ESState], Toast.LENGTH_SHORT).show();
+            ESState = 1 - ESState;
+            RootHandler.executeCommandAndWaitFor("settings put global low_power "+ESState,null,true,null);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            h.postDelayed(()->Toast.makeText(context, "Exception: "+e.getMessage(), Toast.LENGTH_SHORT).show(),1000);
+        }
+    }
+
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleData:
@@ -172,6 +192,9 @@ public class MainActivity extends Activity {
                 break;
             case R.id.toggleAirplane:
                 toggleAirplane(this);
+                break;
+            case R.id.toggleES:
+                toggleEnergySaving(this);
         }
     }
 }

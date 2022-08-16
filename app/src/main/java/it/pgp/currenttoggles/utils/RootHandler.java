@@ -2,9 +2,11 @@ package it.pgp.currenttoggles.utils;
 
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 
 /**
@@ -50,9 +52,9 @@ public class RootHandler {
         return found;
     }
 
-    public static int executeCommandAndWaitFor(String commandString, File workingDir, boolean runAsSuperUser) throws IOException {
+    public static Process executeCommand(String commandString, File workingDir, boolean runAsSuperUser) throws IOException {
         Process p;
-        if (runAsSuperUser) {
+        if(runAsSuperUser) {
             p = Runtime.getRuntime().exec("su");
             DataOutputStream dos = new DataOutputStream(p.getOutputStream());
             if (workingDir != null) {
@@ -62,15 +64,24 @@ public class RootHandler {
             dos.writeBytes("exit\n");
             dos.flush();
             dos.close();
-        } else {
+        }
+        else {
             p = (workingDir==null)?
                     Runtime.getRuntime().exec(commandString):
                     Runtime.getRuntime().exec(commandString,null,workingDir);
         }
+        return p; // p started, not joined
+    }
 
-//        lastStartedPid = getPidOfProcess(p);
+    public static int executeCommandAndWaitFor(String commandString, File workingDir, boolean runAsSuperUser, StringBuilder output) throws IOException {
+        Process p = executeCommand(commandString, workingDir, runAsSuperUser);
 
-//        return p; // p started, not joined
+        // capture output from process
+        if(output != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while((line = reader.readLine()) != null) output.append(line).append("\n");
+        }
 
         int exitValue;
         try {
@@ -80,17 +91,7 @@ public class RootHandler {
             e.printStackTrace();
             exitValue = -1;
         }
-        return exitValue;
 
-//        StringBuilder output = new StringBuilder();
-//        // no console output expected from process
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//        String line;
-//        while ((line = reader.readLine()) != null) {
-//            output.append(line).append("\n");
-//        }
-//
-//        Log.d(RootHandler.class.getName(), "***BEGIN Parent process output:***\n" + output.toString() + "\n***END Parent process output***\nExit value: " + exitValue);
+        return exitValue;
     }
 }

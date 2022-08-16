@@ -23,6 +23,7 @@ public class MainWidget extends AppWidgetProvider {
     private static final String onDemandAutoBrightness = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AUTO_BR";
     private static final String onDemandFlashlight = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_FLASH";
     private static final String onDemandAirplane = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AIRPLANE";
+    private static final String onDemandES = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_ES";
 
     public static void updateAllDirect(Context context) {
         Log.d(MainWidget.class.getName(),"updateAllDirect");
@@ -93,6 +94,14 @@ public class MainWidget extends AppWidgetProvider {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.toggle_airplane, pi);
 
+            ii = new Intent(context, MainWidget.class);
+            ii.setAction(onDemandES);
+            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
+            pi = PendingIntent.getBroadcast(
+                    context, appWidgetId, ii,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.toggle_es, pi);
+
             widgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
     }
@@ -133,6 +142,10 @@ public class MainWidget extends AppWidgetProvider {
                 case onDemandAirplane:
                     Log.d(LOG_PREFIX,"onDemand Airplane");
                     MainActivity.toggleAirplane(context);
+                    break;
+                case onDemandES:
+                    Log.d(LOG_PREFIX,"onDemand ES");
+                    MainActivity.toggleEnergySaving(context);
                     break;
                 default:
                     break;
