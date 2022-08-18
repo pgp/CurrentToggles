@@ -12,6 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
+        android:text="Hotspot"
+        android:onClick="toggle"
+        android:id="@+id/toggleHotspot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
         android:text="Wifi"
         android:onClick="toggle"
         android:id="@+id/toggleWifi"

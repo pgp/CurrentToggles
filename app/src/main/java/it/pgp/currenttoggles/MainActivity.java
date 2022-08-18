@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.camera2.CameraManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,8 @@ import java.util.HashSet;
 
 import it.pgp.currenttoggles.utils.Misc;
 import it.pgp.currenttoggles.utils.RootHandler;
+import it.pgp.currenttoggles.utils.oreoap.MyOnStartTetheringCallback;
+import it.pgp.currenttoggles.utils.oreoap.MyOreoWifiManager;
 
 public class MainActivity extends Activity {
 
@@ -36,6 +39,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    public static void launchWriteSettings(Context context) {
+        Toast.makeText(context, "Please grant system settings write permission in order to use this toggle", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i);
     }
 
     public static void toggleDataWifiBluetoothGps(Context context, String channel, II ii) { // channel: "data" or "wifi"
@@ -123,10 +133,7 @@ public class MainActivity extends Activity {
         }
         catch(SecurityException e) {
             e.printStackTrace();
-            Toast.makeText(context, "Please grant system settings write permission in order to use this toggle", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(i);
+            launchWriteSettings(context);
         }
     }
 
@@ -231,8 +238,28 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static void toggleHotspot(Context context) {
+        if (!Settings.System.canWrite(context)) {
+            launchWriteSettings(context);
+        }
+        else {
+            MyOreoWifiManager apManager = new MyOreoWifiManager(context);
+            if(apManager.isTetherActive()) {
+                apManager.stopTethering();
+                Toast.makeText(context, "AP stopped", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                apManager.startTethering(new MyOnStartTetheringCallback());
+                Toast.makeText(context, "AP started", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     public void toggle(View v) {
         switch(v.getId()) {
+            case R.id.toggleHotspot:
+                toggleHotspot(this);
+                break;
             case R.id.toggleData:
                 toggleDataWifiBluetoothGps(this, "data", Misc::isDataConnectionEnabled);
                 break;

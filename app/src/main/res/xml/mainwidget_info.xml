@@ -2,7 +2,7 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/buttons_widget"
     android:initialLayout="@layout/buttons_widget"
-    android:minWidth="110dp"
+    android:minWidth="300dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen" />

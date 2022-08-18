@@ -18,6 +18,7 @@ public class MainWidget extends AppWidgetProvider {
 
     private static final String onDemandWifi = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_WIFI";
     private static final String onDemandData = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_DATA";
+    private static final String onDemandHotspot = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_HOTSPOT";
     private static final String onDemandBluetooth = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_BLUETOOTH";
     private static final String onDemandGps = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_GPS";
     private static final String onDemandAutoBrightness = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AUTO_BR";
@@ -37,6 +38,14 @@ public class MainWidget extends AppWidgetProvider {
             final int[] w_ids = new int[]{appWidgetId};
             Intent ii;
             PendingIntent pi;
+
+            ii = new Intent(context, MainWidget.class);
+            ii.setAction(onDemandHotspot);
+            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
+            pi = PendingIntent.getBroadcast(
+                    context, appWidgetId, ii,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.toggle_hotspot, pi);
 
             ii = new Intent(context, MainWidget.class);
             ii.setAction(onDemandData);
@@ -121,6 +130,10 @@ public class MainWidget extends AppWidgetProvider {
                 case onDemandData:
                     Log.d(LOG_PREFIX,"onDemand Data");
                     MainActivity.toggleDataWifiBluetoothGps(context, "data", Misc::isDataConnectionEnabled);
+                    break;
+                case onDemandHotspot:
+                    Log.d(LOG_PREFIX,"onDemand Hotspot");
+                    MainActivity.toggleHotspot(context);
                     break;
                 case onDemandBluetooth:
                     Log.d(LOG_PREFIX,"onDemand Bluetooth");

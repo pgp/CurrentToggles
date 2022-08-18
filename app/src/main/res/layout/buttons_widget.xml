@@ -13,6 +13,14 @@
         android:layout_height="match_parent" />
 
     <ImageButton
+        android:id="@+id/toggle_hotspot"
+        android:src="@drawable/hotspot"
+        style="@android:style/Widget.Holo.ImageButton"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <ImageButton
         android:id="@+id/toggle_wifi"
         android:src="@drawable/wifi"
         style="@android:style/Widget.Holo.ImageButton"
