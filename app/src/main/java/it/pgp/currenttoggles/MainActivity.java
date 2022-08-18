@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.camera2.CameraManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,6 +48,16 @@ public class MainActivity extends Activity {
         Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
+    }
+
+    public static void toggleWifi(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        boolean stateToSet = !wifiManager.isWifiEnabled();
+        if(!wifiManager.setWifiEnabled(stateToSet)) {
+            // try with root
+            toggleDataWifiBluetoothGps(context, "wifi", Misc::isWifiEnabled);
+        }
+        else Toast.makeText(context, "Wifi "+(stateToSet?"enabled":"disabled"), Toast.LENGTH_SHORT).show();
     }
 
     public static void toggleDataWifiBluetoothGps(Context context, String channel, II ii) { // channel: "data" or "wifi"
@@ -275,7 +286,7 @@ public class MainActivity extends Activity {
                 toggleDataWifiBluetoothGps(this, "data", Misc::isDataConnectionEnabled);
                 break;
             case R.id.toggleWifi:
-                toggleDataWifiBluetoothGps(this, "wifi", Misc::isWifiEnabled);
+                toggleWifi(this);
                 break;
             case R.id.toggleBt:
 //                toggleDataWifiBluetoothGps(this, "bluetooth", Misc::isBluetoothEnabled); // no need to do this using root

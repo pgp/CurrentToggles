@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "it.pgp.currenttoggles"
-        minSdkVersion 21
+        minSdkVersion 21 // for sdk 19 and lower, just use the great PowerToggles :)
         targetSdkVersion 28
         versionCode 111220816
         versionName "1.1.1"

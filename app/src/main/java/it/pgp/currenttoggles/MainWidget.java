@@ -125,7 +125,7 @@ public class MainWidget extends AppWidgetProvider {
             switch(a) {
                 case onDemandWifi:
                     Log.d(LOG_PREFIX,"onDemand Wifi");
-                    MainActivity.toggleDataWifiBluetoothGps(context, "wifi", Misc::isWifiEnabled);
+                    MainActivity.toggleWifi(context);
                     break;
                 case onDemandData:
                     Log.d(LOG_PREFIX,"onDemand Data");
