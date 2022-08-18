@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "it.pgp.currenttoggles"
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 111220816
         versionName "1.1.1"

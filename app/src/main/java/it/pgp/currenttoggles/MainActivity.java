@@ -26,6 +26,7 @@ import it.pgp.currenttoggles.utils.Misc;
 import it.pgp.currenttoggles.utils.RootHandler;
 import it.pgp.currenttoggles.utils.oreoap.MyOnStartTetheringCallback;
 import it.pgp.currenttoggles.utils.oreoap.MyOreoWifiManager;
+import it.pgp.currenttoggles.utils.oreoap.PreOreoWifiManager;
 
 public class MainActivity extends Activity {
 
@@ -239,18 +240,28 @@ public class MainActivity extends Activity {
     }
 
     public static void toggleHotspot(Context context) {
-        if (!Settings.System.canWrite(context)) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(context)) {
             launchWriteSettings(context);
         }
         else {
-            MyOreoWifiManager apManager = new MyOreoWifiManager(context);
-            if(apManager.isTetherActive()) {
-                apManager.stopTethering();
-                Toast.makeText(context, "AP stopped", Toast.LENGTH_SHORT).show();
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                PreOreoWifiManager apManager = new PreOreoWifiManager(context);
+                boolean targetState = !apManager.isApOn();
+                if(apManager.configApState(targetState))
+                    Toast.makeText(context, "AP "+(targetState?"started":"stopped"), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(context, "Unable to change AP state", Toast.LENGTH_SHORT).show();
             }
             else {
-                apManager.startTethering(new MyOnStartTetheringCallback());
-                Toast.makeText(context, "AP started", Toast.LENGTH_SHORT).show();
+                MyOreoWifiManager apManager = new MyOreoWifiManager(context);
+                if(apManager.isTetherActive()) {
+                    apManager.stopTethering();
+                    Toast.makeText(context, "AP stopped", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    apManager.startTethering(new MyOnStartTetheringCallback());
+                    Toast.makeText(context, "AP started", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
