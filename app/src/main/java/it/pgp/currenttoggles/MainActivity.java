@@ -180,7 +180,10 @@ public class MainActivity extends Activity {
         }
     }
 
-    public static boolean detectTorchMode(Context context) {
+    // 0: torch is off
+    // 1: torch is on
+    // -1: unable to detect (no root?)
+    public static int detectTorchMode(Context context) {
         SharedPreferences settings = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
         String torchModePath = settings.getString(TORCH_MODE_PATH, "");
 
@@ -189,26 +192,34 @@ public class MainActivity extends Activity {
             SharedPreferences.Editor editor = settings.edit();
             editor.putString(TORCH_MODE_PATH,torchModePath).apply();
         }
-        if("N/A".equals(torchModePath)) return false; // torch mode file path detection has been performed (in another run or just now), and there were errors
+        if("N/A".equals(torchModePath)) return -1; // torch mode file path detection has been performed (in another run or just now), and there were errors
         else {
             try {
                 StringBuilder sb = new StringBuilder();
                 int exitValue = RootHandler.executeCommandAndWaitFor("cat "+torchModePath+"/brightness", workDir, true, sb);
                 if(exitValue != 0) {
                     Log.e("CTORCH","no brightness file found under /sys/class/leds/" + torchModePath);
-                    return false;
+                    return -1;
                 }
-                return Integer.parseInt(sb.toString().trim()) != 0;
+                return Integer.parseInt(sb.toString().trim()) == 0 ? 0 : 1;
             }
             catch(Exception e) {
                 e.printStackTrace();
-                return false;
+                return -1;
             }
         }
     }
 
+    /*
+    when root is not available, current torch status can't be queried because /sys/class/leds is not accessible;
+    in that case, just start assuming torch is off - this will result in having to press the torch button twice
+    if you previously changed its status an odd number of times from outside this app/widget,
+    i.e. from the system drop-down menu
+    */
+    public static boolean flashlightEnabled = false;
     public static void toggleFlashlight(Context context) {
-        boolean flashlightEnabled = detectTorchMode(context);
+        int flashlightStatus = detectTorchMode(context);
+        if(flashlightStatus >= 0) flashlightEnabled = flashlightStatus != 0;
 
         CameraManager camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         String cameraId;
@@ -223,6 +234,7 @@ public class MainActivity extends Activity {
         boolean b = !flashlightEnabled;
         try {
             camManager.setTorchMode(cameraId, b);
+            flashlightEnabled = b;
             Toast.makeText(context, "Flashlight "+(b?"ON":"OFF"), Toast.LENGTH_SHORT).show();
         }
         catch(Exception e) {
