@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "it.pgp.currenttoggles"
         minSdkVersion 21 // for sdk 19 and lower, just use the great PowerToggles :)
-        targetSdkVersion 28
+        targetSdkVersion 28 // do not raise this, otherwise wifi toggle won't work without root on api 29+
         versionCode 120220819
         versionName "1.2.0"
     }
