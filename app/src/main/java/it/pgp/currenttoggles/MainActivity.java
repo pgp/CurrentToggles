@@ -289,6 +289,17 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static void turnOffAndLockScreen(Context context) {
+        int exitCode = -1;
+        try {
+            exitCode = RootHandler.executeCommandAndWaitFor("input keyevent KEYCODE_POWER",null,true,null);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        if(exitCode != 0) Toast.makeText(context, "Unable to turn off screen", Toast.LENGTH_SHORT).show();
+    }
+
     public void toggle(View v) {
         switch(v.getId()) {
             case R.id.toggleHotspot:
@@ -318,6 +329,9 @@ public class MainActivity extends Activity {
                 break;
             case R.id.toggleES:
                 toggleEnergySaving(this);
+                break;
+            case R.id.turnOffScreen:
+                turnOffAndLockScreen(this);
         }
     }
 }

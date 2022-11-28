@@ -25,6 +25,7 @@ public class MainWidget extends AppWidgetProvider {
     private static final String onDemandFlashlight = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_FLASH";
     private static final String onDemandAirplane = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AIRPLANE";
     private static final String onDemandES = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_ES";
+    private static final String onDemandTurnOffScreen = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_TURN_OFF_SCREEN";
 
     public static void updateAllDirect(Context context) {
         Log.d(MainWidget.class.getName(),"updateAllDirect");
@@ -111,6 +112,14 @@ public class MainWidget extends AppWidgetProvider {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.toggle_es, pi);
 
+            ii = new Intent(context, MainWidget.class);
+            ii.setAction(onDemandTurnOffScreen);
+            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
+            pi = PendingIntent.getBroadcast(
+                    context, appWidgetId, ii,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.turnoff_screen, pi);
+
             widgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
     }
@@ -159,6 +168,10 @@ public class MainWidget extends AppWidgetProvider {
                 case onDemandES:
                     Log.d(LOG_PREFIX,"onDemand ES");
                     MainActivity.toggleEnergySaving(context);
+                    break;
+                case onDemandTurnOffScreen:
+                    Log.d(LOG_PREFIX,"onDemand Turn Off Screen");
+                    MainActivity.turnOffAndLockScreen(context);
                     break;
                 default:
                     break;
