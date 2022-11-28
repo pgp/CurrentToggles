@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import it.pgp.currenttoggles.utils.Misc;
 
 
@@ -27,6 +30,20 @@ public class MainWidget extends AppWidgetProvider {
     private static final String onDemandES = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_ES";
     private static final String onDemandTurnOffScreen = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_TURN_OFF_SCREEN";
 
+    public static final Map<String,Integer> m = new HashMap<>();
+    static {
+        m.put(onDemandWifi, R.id.toggle_wifi);
+        m.put(onDemandData, R.id.toggle_data);
+        m.put(onDemandHotspot, R.id.toggle_hotspot);
+        m.put(onDemandBluetooth, R.id.toggle_bt);
+        m.put(onDemandGps, R.id.toggle_gps);
+        m.put(onDemandAutoBrightness, R.id.toggle_auto_brightness);
+        m.put(onDemandFlashlight, R.id.toggle_flashlight);
+        m.put(onDemandAirplane, R.id.toggle_airplane);
+        m.put(onDemandES, R.id.toggle_es);
+        m.put(onDemandTurnOffScreen, R.id.turnoff_screen);
+    }
+
     public static void updateAllDirect(Context context) {
         Log.d(MainWidget.class.getName(),"updateAllDirect");
         AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
@@ -35,90 +52,18 @@ public class MainWidget extends AppWidgetProvider {
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.buttons_widget);
 
-        for (int appWidgetId : ids) {
+        for(int appWidgetId : ids) {
             final int[] w_ids = new int[]{appWidgetId};
             Intent ii;
             PendingIntent pi;
 
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandHotspot);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_hotspot, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandData);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_data, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandWifi);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_wifi, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandBluetooth);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_bt, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandGps);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_gps, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandAutoBrightness);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_auto_brightness, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandFlashlight);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_flashlight, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandAirplane);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_airplane, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandES);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.toggle_es, pi);
-
-            ii = new Intent(context, MainWidget.class);
-            ii.setAction(onDemandTurnOffScreen);
-            ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
-            pi = PendingIntent.getBroadcast(
-                    context, appWidgetId, ii,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.turnoff_screen, pi);
+            for(Map.Entry<String,Integer> entry : m.entrySet()) {
+                ii = new Intent(context, MainWidget.class);
+                ii.setAction(entry.getKey());
+                ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
+                pi = PendingIntent.getBroadcast(context, appWidgetId, ii, PendingIntent.FLAG_UPDATE_CURRENT);
+                remoteViews.setOnClickPendingIntent(entry.getValue(), pi);
+            }
 
             widgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
