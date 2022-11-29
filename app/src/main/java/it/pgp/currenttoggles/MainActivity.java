@@ -37,6 +37,10 @@ public class MainActivity extends Activity {
 
     public static final Handler h = new Handler(Looper.getMainLooper());
 
+    public static void postToast(Context context, String msg) {
+        h.post(()->Toast.makeText(context, msg, Toast.LENGTH_SHORT).show());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +48,7 @@ public class MainActivity extends Activity {
     }
 
     public static void launchWriteSettings(Context context) {
-        Toast.makeText(context, "Please grant system settings write permission in order to use this toggle", Toast.LENGTH_SHORT).show();
+        postToast(context, "Please grant system settings write permission in order to use this toggle");
         Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
@@ -57,7 +61,7 @@ public class MainActivity extends Activity {
             // try with root
             toggleDataWifiBluetoothGps(context, "wifi", Misc::isWifiEnabled);
         }
-        else Toast.makeText(context, "Wifi "+(stateToSet?"enabled":"disabled"), Toast.LENGTH_SHORT).show();
+        else postToast(context, "Wifi "+(stateToSet?"enabled":"disabled"));
     }
 
     public static void toggleDataWifiBluetoothGps(Context context, String channel, II ii) { // channel: "data" or "wifi"
@@ -66,7 +70,7 @@ public class MainActivity extends Activity {
                 {channel + " currently ENABLED -> disabling...", "disable"}
         };
         int i = ii.isEnabled(context) ? 1 : 0;
-        Toast.makeText(context, cmdsAndErrors[i][0], Toast.LENGTH_SHORT).show();
+        postToast(context, cmdsAndErrors[i][0]);
         try {
             if(!("gps".equals(channel))) {
                 // svc data enable VS svc data disable
@@ -92,15 +96,14 @@ public class MainActivity extends Activity {
         }
         catch (IOException e) {
             e.printStackTrace();
-            h.postDelayed(()->Toast.makeText(context, "IOException", Toast.LENGTH_SHORT).show(),1000);
+            postToast(context, "IOException");
         }
     }
 
     public static void toggleAirplane(Context context) {
         String[] msgs = {"Airplane Currently DISABLED -> enabling...", "Airplane Currently ENABLED -> disabling..."};
-
         int airplaneEnabled = Misc.isAirplaneModeEnabled(context) ? 1 : 0;
-        Toast.makeText(context, msgs[airplaneEnabled], Toast.LENGTH_SHORT).show();
+        postToast(context, msgs[airplaneEnabled]);
         try {
             RootHandler.executeCommandAndWaitFor(
                     "settings put global airplane_mode_on "+(1-airplaneEnabled)+" && am broadcast -a android.intent.action.AIRPLANE_MODE",
@@ -108,7 +111,7 @@ public class MainActivity extends Activity {
         }
         catch(IOException e) {
             e.printStackTrace();
-            h.postDelayed(()->Toast.makeText(context, "IOException", Toast.LENGTH_SHORT).show(),1000);
+            h.postDelayed(()->Toast.makeText(context, "IOException: "+e.getMessage(), Toast.LENGTH_SHORT).show(),1000);
         }
     }
 
@@ -123,7 +126,7 @@ public class MainActivity extends Activity {
             bta.enable();
             msg += "enabled";
         }
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        postToast(context, msg);
     }
 
     public static void toggleAutoScreenBrightness(Context context) {
@@ -137,11 +140,11 @@ public class MainActivity extends Activity {
                 Settings.System.putInt(resolver,
                         Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC); // now it auto-adapts
             }
-            Toast.makeText(context, "Brightness set to " + (isAuto ? "manual" : "auto"), Toast.LENGTH_SHORT).show();
+            postToast(context, "Brightness set to " + (isAuto ? "manual" : "auto"));
         }
         catch(Settings.SettingNotFoundException e) {
             e.printStackTrace();
-            Toast.makeText(context, "Unable to modify auto/manual brightness setting", Toast.LENGTH_SHORT).show();
+            postToast(context, "Unable to modify auto/manual brightness setting");
         }
         catch(SecurityException e) {
             e.printStackTrace();
@@ -220,7 +223,6 @@ public class MainActivity extends Activity {
     public static void toggleFlashlight(Context context) {
         int flashlightStatus = detectTorchMode(context);
         if(flashlightStatus >= 0) flashlightEnabled = flashlightStatus != 0;
-
         CameraManager camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         String cameraId;
         try {
@@ -228,19 +230,21 @@ public class MainActivity extends Activity {
         }
         catch(Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, "Unable to access flashlight", Toast.LENGTH_SHORT).show();
+            postToast(context, "Unable to access flashlight");
             return;
         }
         boolean b = !flashlightEnabled;
+        String resultMsg;
         try {
             camManager.setTorchMode(cameraId, b);
             flashlightEnabled = b;
-            Toast.makeText(context, "Flashlight "+(b?"ON":"OFF"), Toast.LENGTH_SHORT).show();
+            resultMsg = "Flashlight "+(b?"ON":"OFF");
         }
         catch(Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, "Unable to toggle flashlight status", Toast.LENGTH_SHORT).show();
+            resultMsg = "Unable to toggle flashlight status";
         }
+        postToast(context, resultMsg);
     }
 
     public static void toggleEnergySaving(Context context) {
@@ -252,7 +256,7 @@ public class MainActivity extends Activity {
             if(exitValue != 0) throw new Exception("Exit value for toggleEnergySaving get command: "+exitValue);
             int ESState = Integer.parseInt(output.toString().trim());
             if(ESState != 0 && ESState != 1) throw new Exception("Unexpected parsed ES state: "+ESState);
-            Toast.makeText(context, msgs[ESState], Toast.LENGTH_SHORT).show();
+            postToast(context, msgs[ESState]);
             ESState = 1 - ESState;
             RootHandler.executeCommandAndWaitFor("settings put global low_power "+ESState,null,true,null);
         }
@@ -267,25 +271,25 @@ public class MainActivity extends Activity {
             launchWriteSettings(context);
         }
         else {
+            String resultMsg;
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 PreOreoWifiManager apManager = new PreOreoWifiManager(context);
                 boolean targetState = !apManager.isApOn();
-                if(apManager.configApState(targetState))
-                    Toast.makeText(context, "AP "+(targetState?"started":"stopped"), Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(context, "Unable to change AP state", Toast.LENGTH_SHORT).show();
+                if(apManager.configApState(targetState)) resultMsg = "AP "+(targetState?"started":"stopped");
+                else resultMsg = "Unable to change AP state";
             }
             else {
                 MyOreoWifiManager apManager = new MyOreoWifiManager(context);
                 if(apManager.isTetherActive()) {
                     apManager.stopTethering();
-                    Toast.makeText(context, "AP stopped", Toast.LENGTH_SHORT).show();
+                    resultMsg = "AP stopped";
                 }
                 else {
                     apManager.startTethering(new MyOnStartTetheringCallback());
-                    Toast.makeText(context, "AP started", Toast.LENGTH_SHORT).show();
+                    resultMsg = "AP started";
                 }
             }
+            postToast(context, resultMsg);
         }
     }
 
@@ -297,7 +301,7 @@ public class MainActivity extends Activity {
         catch(IOException e) {
             e.printStackTrace();
         }
-        if(exitCode != 0) Toast.makeText(context, "Unable to turn off screen", Toast.LENGTH_SHORT).show();
+        if(exitCode != 0) postToast(context, "Unable to turn off screen");
     }
 
     public void toggle(View v) {
