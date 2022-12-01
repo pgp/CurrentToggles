@@ -1,6 +1,7 @@
 package it.pgp.currenttoggles;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -42,8 +43,31 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1234) {
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if(nm.areNotificationsEnabled()) {
+                MainWidget.updateAllDirect(getBaseContext());
+                Toast.makeText(this, "Widget notifications enabled", Toast.LENGTH_SHORT).show();
+            }
+            else Toast.makeText(this, "Please grant notifications permissions on Android 13 in order to show toast messages from widget", Toast.LENGTH_SHORT).show();
+            finishAffinity();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // TODO if needed, use same XFiles mechanism for avoiding repeated intents
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getString("NOTIFS") != null) {
+            Intent ii = new Intent();
+            ii.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+//                ii.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // needed only when launching directly from widget
+            ii.putExtra("android.provider.extra.APP_PACKAGE", getPackageName());
+            startActivityForResult(ii, 1234);
+        }
         setContentView(R.layout.activity_main);
     }
 

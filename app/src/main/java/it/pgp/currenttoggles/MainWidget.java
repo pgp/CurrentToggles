@@ -1,11 +1,13 @@
 package it.pgp.currenttoggles;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -51,13 +53,30 @@ public class MainWidget extends AppWidgetProvider {
         widgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.list);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.buttons_widget);
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        boolean notifsOff = Build.VERSION.SDK_INT >= 33 && !nm.areNotificationsEnabled();
 
         for(int appWidgetId : ids) {
             final int[] w_ids = new int[]{appWidgetId};
             Intent ii;
             PendingIntent pi;
 
-            for(Map.Entry<String,Integer> entry : m.entrySet()) {
+            if(notifsOff) for(Map.Entry<String,Integer> entry : m.entrySet()) {
+                // this is not enough: we need a callback (onActivityResult) to redraw the widget on permissions granted
+//                ii = new Intent();
+//                ii.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+//                ii.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                ii.putExtra("android.provider.extra.APP_PACKAGE", context.getPackageName());
+
+                ii = new Intent(context, MainActivity.class);
+                ii.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ii.putExtra("NOTIFS", "");
+
+                ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
+                pi = PendingIntent.getActivity(context, 0, ii, 0);
+                remoteViews.setOnClickPendingIntent(entry.getValue(), pi);
+            }
+            else for(Map.Entry<String,Integer> entry : m.entrySet()) {
                 ii = new Intent(context, MainWidget.class);
                 ii.setAction(entry.getKey());
                 ii.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, w_ids);
