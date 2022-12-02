@@ -53,15 +53,17 @@ public class MainWidget extends AppWidgetProvider {
         widgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.list);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.buttons_widget);
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        boolean notifsOff = Build.VERSION.SDK_INT >= 33 && !nm.areNotificationsEnabled();
+        boolean notifsOn = Build.VERSION.SDK_INT < 33; // Android 13 (Build.VERSION_CODES.TIRAMISU)
+        if(!notifsOn) {
+            notifsOn = ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE)).areNotificationsEnabled();
+        }
 
         for(int appWidgetId : ids) {
             final int[] w_ids = new int[]{appWidgetId};
             Intent ii;
             PendingIntent pi;
 
-            if(notifsOff) for(Map.Entry<String,Integer> entry : m.entrySet()) {
+            if(!notifsOn) for(Map.Entry<String,Integer> entry : m.entrySet()) {
                 // this is not enough: we need a callback (onActivityResult) to redraw the widget on permissions granted
 //                ii = new Intent();
 //                ii.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
