@@ -3,6 +3,7 @@ package it.pgp.currenttoggles;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -54,6 +55,7 @@ public class MainActivity extends Activity {
             else Toast.makeText(this, "Please grant notifications permissions on Android 13 in order to show toast messages from widget", Toast.LENGTH_SHORT).show();
             finishAffinity();
         }
+        else if(requestCode == 1235) finishAffinity();
     }
 
     @Override
@@ -61,12 +63,21 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         // TODO if needed, use same XFiles mechanism for avoiding repeated intents
         Bundle extras = getIntent().getExtras();
-        if(extras != null && extras.getString("NOTIFS") != null) {
-            Intent ii = new Intent();
-            ii.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+        if(extras != null) {
+            if(extras.getString("NOTIFS") != null) {
+                Intent ii = new Intent();
+                ii.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
 //                ii.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // needed only when launching directly from widget
-            ii.putExtra("android.provider.extra.APP_PACKAGE", getPackageName());
-            startActivityForResult(ii, 1234);
+                ii.putExtra("android.provider.extra.APP_PACKAGE", getPackageName());
+                startActivityForResult(ii, 1234);
+            }
+            else if(extras.getString("HOTSPOT_OPTIONS") != null) {
+                Intent options = new Intent(Intent.ACTION_MAIN, null);
+                options.addCategory(Intent.CATEGORY_LAUNCHER);
+                options.setComponent(new ComponentName("com.android.settings", "com.android.settings.TetherSettings"));
+                startActivityForResult(options, 1235);
+                return;
+            }
         }
         setContentView(R.layout.activity_main);
     }

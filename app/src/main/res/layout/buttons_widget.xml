@@ -4,45 +4,118 @@
     android:layout_height="wrap_content"
     android:background="@color/deep_blue" >
 
-    <ImageButton
-        android:id="@+id/toggle_data"
-        android:src="@drawable/data"
-        style="@android:style/Widget.Holo.ImageButton"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
 
-    <ImageButton
-        android:id="@+id/toggle_hotspot"
-        android:src="@drawable/hotspot"
-        style="@android:style/Widget.Holo.ImageButton"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        <ImageButton
+            android:id="@+id/toggle_data"
+            android:src="@drawable/data"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
 
-    <ImageButton
-        android:id="@+id/toggle_wifi"
-        android:src="@drawable/wifi"
-        style="@android:style/Widget.Holo.ImageButton"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        <ImageButton
+            android:id="@+id/data_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/toggle_bt"
-        android:src="@drawable/bt"
-        style="@android:style/Widget.Holo.ImageButton"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
 
-    <ImageButton
-        android:id="@+id/toggle_gps"
-        android:src="@drawable/gps"
-        style="@android:style/Widget.Holo.ImageButton"
+        <ImageButton
+            android:id="@+id/toggle_hotspot"
+            android:src="@drawable/hotspot"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/hotspot_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:id="@+id/toggle_wifi"
+            android:src="@drawable/wifi"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/wifi_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:id="@+id/toggle_bt"
+            android:src="@drawable/bt"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/bluetooth_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:id="@+id/toggle_gps"
+            android:src="@drawable/gps"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/gps_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+
 
     <ImageButton
         android:id="@+id/toggle_auto_brightness"
