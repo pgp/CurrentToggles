@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -41,6 +42,15 @@ public class MainActivity extends Activity {
 
     public static void postToast(Context context, String msg) {
         h.post(()->Toast.makeText(context, msg, Toast.LENGTH_SHORT).show());
+    }
+
+    public static final String toastOffColor = "8d2626"; // red
+    public static final String toastOnColor = "38761d"; // green
+
+    public static void showToast(Context context, String msg, boolean onOff) {
+        String colorString = onOff ? toastOnColor : toastOffColor;
+        Toast toast = Toast.makeText(context, Html.fromHtml("<font color='#"+colorString+"' ><b>" + msg + "</b></font>"), Toast.LENGTH_LONG);
+        h.post(toast::show);
     }
 
     @Override
@@ -96,7 +106,7 @@ public class MainActivity extends Activity {
             // try with root
             toggleDataWifiBluetoothGps(context, "wifi", Misc::isWifiEnabled);
         }
-        else postToast(context, "Wifi "+(stateToSet?"enabled":"disabled"));
+        else showToast(context, "Wifi "+(stateToSet?"enabled":"disabled"), stateToSet);
     }
 
     public static void toggleDataWifiBluetoothGps(Context context, String channel, II ii) { // channel: "data" or "wifi"
@@ -105,7 +115,7 @@ public class MainActivity extends Activity {
                 {channel + " currently ENABLED -> disabling...", "disable"}
         };
         int i = ii.isEnabled(context) ? 1 : 0;
-        postToast(context, cmdsAndErrors[i][0]);
+        showToast(context, cmdsAndErrors[i][0], i == 0);
         try {
             if(!("gps".equals(channel))) {
                 // svc data enable VS svc data disable
@@ -138,7 +148,7 @@ public class MainActivity extends Activity {
     public static void toggleAirplane(Context context) {
         String[] msgs = {"Airplane Currently DISABLED -> enabling...", "Airplane Currently ENABLED -> disabling..."};
         int airplaneEnabled = Misc.isAirplaneModeEnabled(context) ? 1 : 0;
-        postToast(context, msgs[airplaneEnabled]);
+        showToast(context, msgs[airplaneEnabled], airplaneEnabled == 0);
         try {
             RootHandler.executeCommandAndWaitFor(
                     "settings put global airplane_mode_on "+(1-airplaneEnabled)+" && am broadcast -a android.intent.action.AIRPLANE_MODE",
@@ -153,7 +163,8 @@ public class MainActivity extends Activity {
     public static void toggleBluetooth(Context context) {
         BluetoothAdapter bta = BluetoothAdapter.getDefaultAdapter();
         String msg = "Bluetooth ";
-        if(bta.isEnabled()) {
+        boolean currentState = bta.isEnabled();
+        if(currentState) {
             bta.disable();
             msg += "disabled";
         }
@@ -161,7 +172,7 @@ public class MainActivity extends Activity {
             bta.enable();
             msg += "enabled";
         }
-        postToast(context, msg);
+        showToast(context, msg, !currentState);
     }
 
     public static void toggleAutoScreenBrightness(Context context) {
@@ -274,12 +285,12 @@ public class MainActivity extends Activity {
             camManager.setTorchMode(cameraId, b);
             flashlightEnabled = b;
             resultMsg = "Flashlight "+(b?"ON":"OFF");
+            showToast(context, resultMsg, b);
         }
         catch(Exception e) {
             e.printStackTrace();
-            resultMsg = "Unable to toggle flashlight status";
+            postToast(context, "Unable to toggle flashlight status");
         }
-        postToast(context, resultMsg);
     }
 
     public static void toggleEnergySaving(Context context) {
@@ -291,7 +302,7 @@ public class MainActivity extends Activity {
             if(exitValue != 0) throw new Exception("Exit value for toggleEnergySaving get command: "+exitValue);
             int ESState = Integer.parseInt(output.toString().trim());
             if(ESState != 0 && ESState != 1) throw new Exception("Unexpected parsed ES state: "+ESState);
-            postToast(context, msgs[ESState]);
+            showToast(context, msgs[ESState], ESState == 0);
             ESState = 1 - ESState;
             RootHandler.executeCommandAndWaitFor("settings put global low_power "+ESState,null,true,null);
         }
@@ -307,11 +318,15 @@ public class MainActivity extends Activity {
         }
         else {
             String resultMsg;
+            boolean targetState = false;
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 PreOreoWifiManager apManager = new PreOreoWifiManager(context);
-                boolean targetState = !apManager.isApOn();
+                targetState = !apManager.isApOn();
                 if(apManager.configApState(targetState)) resultMsg = "AP "+(targetState?"started":"stopped");
-                else resultMsg = "Unable to change AP state";
+                else {
+                    targetState = false;
+                    resultMsg = "Unable to change AP state";
+                }
             }
             else {
                 MyOreoWifiManager apManager = new MyOreoWifiManager(context);
@@ -322,9 +337,10 @@ public class MainActivity extends Activity {
                 else {
                     apManager.startTethering(new MyOnStartTetheringCallback());
                     resultMsg = "AP started";
+                    targetState = true;
                 }
             }
-            postToast(context, resultMsg);
+            showToast(context, resultMsg, targetState);
         }
     }
 
