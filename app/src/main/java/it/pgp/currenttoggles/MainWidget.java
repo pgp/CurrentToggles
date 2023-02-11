@@ -33,9 +33,12 @@ public class MainWidget extends AppWidgetProvider {
     private static final String onDemandGps = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_GPS";
     private static final String gpsOptions = "it.pgp.currenttoggles.appwidget.action.GPS_OPTIONS";
     private static final String onDemandAutoBrightness = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AUTO_BR";
+    private static final String displayOptions = "it.pgp.currenttoggles.appwidget.action.DISPLAY_OPTIONS";
     private static final String onDemandFlashlight = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_FLASH";
     private static final String onDemandAirplane = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AIRPLANE";
+    private static final String airplaneOptions = "it.pgp.currenttoggles.appwidget.action.AIRPLANE_OPTIONS";
     private static final String onDemandES = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_ES";
+    private static final String esOptions = "it.pgp.currenttoggles.appwidget.action.ES_OPTIONS";
     private static final String onDemandTurnOffScreen = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_TURN_OFF_SCREEN";
 
     public static final Map<String,Integer> m = new HashMap<>();
@@ -58,6 +61,9 @@ public class MainWidget extends AppWidgetProvider {
         o.put(wifiOptions, R.id.wifi_options);
         o.put(bluetoothOptions, R.id.bluetooth_options);
         o.put(gpsOptions, R.id.gps_options);
+        o.put(displayOptions, R.id.display_options);
+        o.put(airplaneOptions, R.id.airplane_options);
+        o.put(esOptions, R.id.es_options);
     }
 
 
@@ -172,6 +178,11 @@ public class MainWidget extends AppWidgetProvider {
                     Log.d(LOG_PREFIX,"onDemand Auto Brightness");
                     MainActivity.toggleAutoScreenBrightness(context);
                     break;
+                case displayOptions:
+                    options = new Intent(Settings.ACTION_DISPLAY_SETTINGS);
+                    options.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(options);
+                    break;
                 case onDemandFlashlight:
                     Log.d(LOG_PREFIX,"onDemand Flashlight");
                     MainActivity.toggleFlashlight(context);
@@ -180,9 +191,19 @@ public class MainWidget extends AppWidgetProvider {
                     Log.d(LOG_PREFIX,"onDemand Airplane");
                     MainActivity.toggleAirplane(context);
                     break;
+                case airplaneOptions:
+                    options = new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS);
+                    options.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(options);
+                    break;
                 case onDemandES:
                     Log.d(LOG_PREFIX,"onDemand ES");
                     MainActivity.toggleEnergySaving(context);
+                    break;
+                case esOptions:
+                    options = new Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS);
+                    options.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(options);
                     break;
                 case onDemandTurnOffScreen:
                     Log.d(LOG_PREFIX,"onDemand Turn Off Screen");

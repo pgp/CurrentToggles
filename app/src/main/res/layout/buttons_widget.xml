@@ -115,15 +115,27 @@
             android:layout_height="0dp" />
     </LinearLayout>
 
-
-
-    <ImageButton
-        android:id="@+id/toggle_auto_brightness"
-        android:src="@drawable/brightness"
-        style="@android:style/Widget.Holo.ImageButton"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:id="@+id/toggle_auto_brightness"
+            android:src="@drawable/brightness"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/display_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/toggle_flashlight"
@@ -133,21 +145,49 @@
         android:layout_width="0dp"
         android:layout_height="match_parent" />
 
-    <ImageButton
-        android:id="@+id/toggle_airplane"
-        android:src="@drawable/airplane"
-        style="@android:style/Widget.Holo.ImageButton"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
 
-    <ImageButton
-        android:id="@+id/toggle_es"
-        android:src="@drawable/battery"
-        style="@android:style/Widget.Holo.ImageButton"
+        <ImageButton
+            android:id="@+id/toggle_airplane"
+            android:src="@drawable/airplane"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/airplane_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:id="@+id/toggle_es"
+            android:src="@drawable/battery"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="2.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+        <ImageButton
+            android:id="@+id/es_options"
+            style="@android:style/Widget.Holo.ImageButton"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/turnoff_screen"
