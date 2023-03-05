@@ -150,8 +150,11 @@ public class MainActivity extends Activity {
         int airplaneEnabled = Misc.isAirplaneModeEnabled(context) ? 1 : 0;
         showToast(context, msgs[airplaneEnabled], airplaneEnabled == 0);
         try {
+            String command = Build.VERSION.SDK_INT < 30 ?
+            "settings put global airplane_mode_on "+(1-airplaneEnabled)+" && am broadcast -a android.intent.action.AIRPLANE_MODE" :
+            "cmd connectivity airplane-mode "+(airplaneEnabled == 0 ? "enable" : "disable");
             RootHandler.executeCommandAndWaitFor(
-                    "settings put global airplane_mode_on "+(1-airplaneEnabled)+" && am broadcast -a android.intent.action.AIRPLANE_MODE",
+                    command,
                     null, true, null);
         }
         catch(IOException e) {
