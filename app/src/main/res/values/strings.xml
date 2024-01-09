@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CurrentToggles</string>
+    <string name="device_admin_lockscreen">Device admin for lockscreen</string>
 </resources>

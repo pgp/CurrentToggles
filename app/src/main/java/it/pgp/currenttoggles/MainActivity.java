@@ -2,6 +2,7 @@ package it.pgp.currenttoggles;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.Html;
 import android.util.Log;
@@ -28,6 +30,7 @@ import java.util.HashSet;
 
 import it.pgp.currenttoggles.utils.Misc;
 import it.pgp.currenttoggles.utils.RootHandler;
+import it.pgp.currenttoggles.utils.deviceadmin.AdminReceiver;
 import it.pgp.currenttoggles.utils.oreoap.MyOnStartTetheringCallback;
 import it.pgp.currenttoggles.utils.oreoap.MyOreoWifiManager;
 import it.pgp.currenttoggles.utils.oreoap.PreOreoWifiManager;
@@ -65,7 +68,7 @@ public class MainActivity extends Activity {
             else Toast.makeText(this, "Please grant notifications permissions on Android 13 in order to show toast messages from widget", Toast.LENGTH_SHORT).show();
             finishAffinity();
         }
-        else if(requestCode == 1235) finishAffinity();
+        else if(requestCode == 1235 || requestCode == 1236) finishAffinity();
     }
 
     @Override
@@ -86,6 +89,13 @@ public class MainActivity extends Activity {
                 options.addCategory(Intent.CATEGORY_LAUNCHER);
                 options.setComponent(new ComponentName("com.android.settings", "com.android.settings.TetherSettings"));
                 startActivityForResult(options, 1235);
+                return;
+            }
+            else if(extras.getString("DEVICEADMIN_OPTIONS") != null) {
+                ComponentName admin = new ComponentName(getApplicationContext(), AdminReceiver.class);
+                Intent options = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                options.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin);
+                startActivityForResult(options, 1236);
                 return;
             }
         }
@@ -347,15 +357,30 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static void powerOffScreenViaDeviceAdmin(Context context) {
+        PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
+        if (pm.isScreenOn()) {
+            DevicePolicyManager policy = (DevicePolicyManager)context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            try {
+                policy.lockNow();
+            }
+            catch(Exception ex) {
+                postToast(context, "Device administrator capability is needed for powering off screen without root access");
+                Intent options = new Intent(context, MainActivity.class);
+                options.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                options.putExtra("DEVICEADMIN_OPTIONS", "");
+                context.startActivity(options);
+            }
+        }
+    }
+
     public static void turnOffAndLockScreen(Context context) {
         int exitCode = -1;
         try {
             exitCode = RootHandler.executeCommandAndWaitFor("input keyevent KEYCODE_POWER",null,true,null);
         }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-        if(exitCode != 0) postToast(context, "Unable to turn off screen");
+        catch(IOException ignored) {}
+        if(exitCode != 0) powerOffScreenViaDeviceAdmin(context);
     }
 
     public void toggle(View v) {
