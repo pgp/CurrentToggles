@@ -306,6 +306,28 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static void setTorch(Context context, boolean b) {
+        CameraManager camManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        String cameraId;
+        try {
+            cameraId = camManager.getCameraIdList()[0];
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            postToast(context, "Unable to access flashlight");
+            return;
+        }
+        try {
+            camManager.setTorchMode(cameraId, b);
+            String resultMsg = "Flashlight "+(b?"ON":"OFF");
+            showToast(context, resultMsg, b);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            postToast(context, "Unable to toggle flashlight status");
+        }
+    }
+
     public static void toggleEnergySaving(Context context) {
         String getCmd = "settings get global low_power";
         String[] msgs = {"Energy saving currently DISABLED -> enabling...", "Energy saving currently ENABLED -> disabling..."};
@@ -405,8 +427,11 @@ public class MainActivity extends Activity {
                 toggleAutoScreenBrightness(this);
                 break;
             case R.id.toggleFlashlight:
-                toggleFlashlight(this);
+                if(Build.VERSION.SDK_INT >= 34) setTorch(this, true);
+                else toggleFlashlight(this);
                 break;
+            case R.id.toggleFlashlight2:
+                setTorch(this, false);
             case R.id.toggleAirplane:
                 toggleAirplane(this);
                 break;

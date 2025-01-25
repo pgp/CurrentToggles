@@ -35,6 +35,7 @@ public class MainWidget extends AppWidgetProvider {
     private static final String onDemandAutoBrightness = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AUTO_BR";
     private static final String displayOptions = "it.pgp.currenttoggles.appwidget.action.DISPLAY_OPTIONS";
     private static final String onDemandFlashlight = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_FLASH";
+    private static final String onDemandFlashlight2 = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_FLASH_2";
     private static final String onDemandAirplane = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_AIRPLANE";
     private static final String airplaneOptions = "it.pgp.currenttoggles.appwidget.action.AIRPLANE_OPTIONS";
     private static final String onDemandES = "it.pgp.currenttoggles.appwidget.action.ON_DEMAND_ES";
@@ -51,7 +52,11 @@ public class MainWidget extends AppWidgetProvider {
         m.put(onDemandBluetooth, R.id.toggle_bt);
         m.put(onDemandGps, R.id.toggle_gps);
         m.put(onDemandAutoBrightness, R.id.toggle_auto_brightness);
-        m.put(onDemandFlashlight, R.id.toggle_flashlight);
+        if(Build.VERSION.SDK_INT >= 34) {
+            m.put(onDemandFlashlight, R.id.flashlight_on);
+            m.put(onDemandFlashlight2, R.id.flashlight_off);
+        }
+        else m.put(onDemandFlashlight, R.id.toggle_flashlight);
         m.put(onDemandAirplane, R.id.toggle_airplane);
         m.put(onDemandES, R.id.toggle_es);
         m.put(onDemandTurnOffScreen, R.id.turnoff_screen);
@@ -185,7 +190,12 @@ public class MainWidget extends AppWidgetProvider {
                     break;
                 case onDemandFlashlight:
                     Log.d(LOG_PREFIX,"onDemand Flashlight");
-                    MainActivity.toggleFlashlight(context);
+                    if(Build.VERSION.SDK_INT >= 34) MainActivity.setTorch(context, true);
+                    else MainActivity.toggleFlashlight(context);
+                    break;
+                case onDemandFlashlight2:
+                    Log.d(LOG_PREFIX,"onDemand Flashlight 2");
+                    MainActivity.setTorch(context, false);
                     break;
                 case onDemandAirplane:
                     Log.d(LOG_PREFIX,"onDemand Airplane");

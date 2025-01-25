@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:text="Data"
+        android:onClick="toggle"
+        android:id="@+id/toggleData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="Hotspot"
+        android:onClick="toggle"
+        android:id="@+id/toggleHotspot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="Wifi"
+        android:onClick="toggle"
+        android:id="@+id/toggleWifi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="Bluetooth"
+        android:onClick="toggle"
+        android:id="@+id/toggleBt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="GPS"
+        android:onClick="toggle"
+        android:id="@+id/toggleGps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="Auto/Manual brightness"
+        android:onClick="toggle"
+        android:id="@+id/toggleAutoBrightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="Flashlight ON"
+            android:onClick="toggle"
+            android:id="@+id/toggleFlashlight"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+        <Button
+            android:text="Flashlight OFF"
+            android:onClick="toggle"
+            android:id="@+id/toggleFlashlight2"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    <Button
+        android:text="Airplane"
+        android:onClick="toggle"
+        android:id="@+id/toggleAirplane"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="Energy saving"
+        android:onClick="toggle"
+        android:id="@+id/toggleES"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="Turn off screen"
+        android:onClick="toggle"
+        android:id="@+id/turnOffScreen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
